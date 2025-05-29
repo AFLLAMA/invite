@@ -1,0 +1,14 @@
+<div class="mt-8">
+    <h2 class="text-lg font-semibold mb-2">Present List</h2>
+    <ul class="space-y-1">
+        {% for present in presents %}
+            {% if present.status == 'secret' and present.taken_by %}
+                <li class="italic text-gray-400">Secret present (taken)</li>
+            {% elif present.status == 'taken' %}
+                <li class="line-through text-gray-400">{{ present.name }} (taken)</li>
+            {% else %}
+                <li>{{ present.name }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
