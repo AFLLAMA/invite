@@ -6,6 +6,7 @@ diesel::table! {
         user_id -> Nullable<Int4>,
         name -> Text,
         link -> Text,
+        status -> Text,
     }
 }
 

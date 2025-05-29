@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Select a Present</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800 flex flex-col items-center justify-center min-h-screen p-6">
+    <div class="max-w-md w-full">
+        <h1 class="text-2xl font-bold mb-4 text-center">Select or Add a Present</h1>
+        <form method="post" action="/select_present" class="space-y-4">
+            <label for="present" class="block text-sm font-medium">Select a present:</label>
+            <select name="present_id" id="present" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                {% for present in presents %}
+                    {% if present.status == 'taken' %}
+                        <option value="{{ present.id }}" disabled class="line-through text-gray-400">{{ present.name }} (taken)</option>
+                    {% elif present.status == 'secret' %}
+                        {% if present.taken_by %}
+                            <option value="{{ present.id }}" disabled class="text-gray-400">Secret present (taken)</option>
+                        {% else %}
+                            <option value="{{ present.id }}">Secret present (available)</option>
+                        {% endif %}
+                    {% else %}
+                        <option value="{{ present.id }}">{{ present.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <button
+                type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+                Take Present
+            </button>
+        </form>
+        {% include "present_list.html" %}
+        <div class="mt-8">
+            <h2 class="text-lg font-semibold mb-2">Add a Present</h2>
+            <form method="post" action="/add_present" class="space-y-2">
+                <input
+                    type="text"
+                    name="present_name"
+                    required
+                    placeholder="Present name"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                />
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="secret" class="form-checkbox" />
+                    <span class="ml-2">Secret present</span>
+                </label>
+                <button
+                    type="submit"
+                    class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                    Add Present
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

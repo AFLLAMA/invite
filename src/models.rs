@@ -22,6 +22,7 @@ pub struct Present {
     pub id: i32,
     pub user_id: Option<i32>,
     pub name: String,
+    pub status: String, // new field
     pub link: String,
 }
 
@@ -30,5 +31,6 @@ pub struct Present {
 pub struct NewPresent {
     pub user_id: Option<i32>,
     pub name: String,
+    pub status: String, // new field
     pub link: String,
 }
