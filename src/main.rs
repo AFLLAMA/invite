@@ -14,6 +14,7 @@ use env_logger;
 
 use actix_web::http::header;
 use serde::Serialize;
+use serde::Deserialize;
 
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
@@ -38,9 +39,10 @@ async fn register_user(
         .get_result::<User>(&mut conn);
 
     match result {
-        Ok(user) => {
-            HttpResponse::Found()
-                .append_header((header::LOCATION, format!("/presents?user_id={}", user.id)))
+        Ok(_user) => {
+            // Redirect to invitation page after registration
+            HttpResponse::SeeOther()
+                .append_header((header::LOCATION, "/invitation"))
                 .finish()
         },
         Err(e) => {
@@ -92,6 +94,101 @@ async fn presents_page(
     HttpResponse::Ok().content_type("text/html").body(html)
 }
 
+async fn invitation_page(
+    env: web::Data<Arc<Environment<'_>>>,
+    query: web::Query<std::collections::HashMap<String, String>>,
+) -> impl Responder {
+    let lang = query.get("lang").map(|s| s.as_str()).unwrap_or("en");
+    let mut ctx = std::collections::HashMap::new();
+    ctx.insert("lang", minijinja::value::Value::from(lang));
+    let tmpl = env.get_template("invitation.html").unwrap();
+    let html = tmpl.render(ctx).unwrap();
+    HttpResponse::Ok().content_type("text/html").body(html)
+}
+
+#[derive(Deserialize)]
+struct AddPresentForm {
+    present_name: String,
+    secret: Option<String>,
+}
+
+async fn add_present(
+    pool: web::Data<DbPool>,
+    form: web::Form<AddPresentForm>,
+) -> impl Responder {
+    use schema::presents;
+    
+    let mut conn = pool.get().unwrap();
+    let form_data = form.into_inner();
+    
+    // Determine status based on whether it's marked as secret
+    let status = if form_data.secret.is_some() {
+        "secret".to_string()
+    } else {
+        "available".to_string()
+    };
+    
+    let new_present = NewPresent {
+        user_id: None,
+        name: form_data.present_name,
+        status,
+        link: String::new(), // Default empty link
+    };
+    
+    let result = diesel::insert_into(presents::table)
+        .values(&new_present)
+        .execute(&mut conn);
+        
+    match result {
+        Ok(_) => {
+            // Redirect back to presents page
+            HttpResponse::SeeOther()
+                .append_header((header::LOCATION, "/presents"))
+                .finish()
+        },
+        Err(e) => {
+            eprintln!("Failed to add present: {}", e);
+            HttpResponse::InternalServerError().body(format!("Failed to add present: {}", e))
+        },
+    }
+}
+
+#[derive(Deserialize)]
+struct SelectPresentForm {
+    present_id: i32,
+}
+
+async fn select_present(
+    pool: web::Data<DbPool>,
+    form: web::Form<SelectPresentForm>,
+) -> impl Responder {
+    use schema::presents::dsl::*;
+    
+    let mut conn = pool.get().unwrap();
+    let present_id = form.present_id;
+    
+    // Update the present status to 'taken'
+    let result = diesel::update(presents.find(present_id))
+        .set((
+            status.eq("taken".to_string()),
+            user_id.eq(1) // For simplicity, assign to user_id=1
+        ))
+        .execute(&mut conn);
+        
+    match result {
+        Ok(_) => {
+            // Redirect back to presents page
+            HttpResponse::SeeOther()
+                .append_header((header::LOCATION, "/presents"))
+                .finish()
+        },
+        Err(e) => {
+            eprintln!("Failed to select present: {}", e);
+            HttpResponse::InternalServerError().body(format!("Failed to select present: {}", e))
+        },
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -114,7 +211,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .route("/", web::get().to(welcome_page))
             .route("/register", web::post().to(register_user))
+            .route("/invitation", web::get().to(invitation_page))
             .route("/presents", web::get().to(presents_page))
+            .route("/add_present", web::post().to(add_present))
+            .route("/select_present", web::post().to(select_present))
     })
     .bind(("127.0.0.1", 8080))?
     .run()

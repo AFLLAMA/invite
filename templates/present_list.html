@@ -1,14 +1,28 @@
-<div class="mt-8">
-    <h2 class="text-lg font-semibold mb-2">Present List</h2>
-    <ul class="space-y-1">
-        {% for present in presents %}
-            {% if present.status == 'secret' and present.taken_by %}
-                <li class="italic text-gray-400">Secret present (taken)</li>
-            {% elif present.status == 'taken' %}
-                <li class="line-through text-gray-400">{{ present.name }} (taken)</li>
-            {% else %}
-                <li>{{ present.name }}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+<div>
+    <h2 class="text-xl font-serif text-gold mb-4">Gift Registry</h2>
+    <div class="bg-champagne bg-opacity-20 rounded-lg p-4">
+        <ul class="divide-y divide-champagne">
+            {% for present in presents %}
+                {% if present.status == 'secret' and present.taken_by %}
+                    <li class="py-3 px-2 flex items-center">
+                        <i data-feather="gift" class="w-4 h-4 mr-3 text-gray-400"></i>
+                        <span class="italic text-gray-400 flex-grow">Secret gift (reserved)</span>
+                        <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full">Reserved</span>
+                    </li>
+                {% elif present.status == 'taken' %}
+                    <li class="py-3 px-2 flex items-center">
+                        <i data-feather="gift" class="w-4 h-4 mr-3 text-gray-400"></i>
+                        <span class="line-through text-gray-400 flex-grow">{{ present.name }}</span>
+                        <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full">Reserved</span>
+                    </li>
+                {% else %}
+                    <li class="py-3 px-2 flex items-center">
+                        <i data-feather="gift" class="w-4 h-4 mr-3 text-gold"></i>
+                        <span class="flex-grow">{{ present.name }}</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Available</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
 </div>

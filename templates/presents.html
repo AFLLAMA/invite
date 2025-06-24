@@ -3,59 +3,190 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Select a Present</title>
+    <title>Wedding Gifts</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        script: ['Great Vibes', 'cursive'],
+                    },
+                    colors: {
+                        'gold': '#d4af37',
+                        'blush': '#ffb6c1',
+                        'sage': '#7a918d',
+                        'champagne': '#f7e7ce',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        body {
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f7e7ce' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .gold-text-shadow {
+            text-shadow: 1px 1px 2px rgba(212, 175, 55, 0.3);
+        }
+        .gift-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .gift-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.1) 40%,
+                rgba(255,255,255,0.4) 50%,
+                rgba(255,255,255,0.1) 60%,
+                rgba(255,255,255,0) 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.6s;
+        }
+        .gift-shine:hover::after {
+            transform: translateX(50%) translateY(50%) rotate(30deg);
+        }
+        select, input[type="text"] {
+            background-color: rgba(255,255,255,0.8);
+            border-color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        select:focus, input[type="text"]:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+    </style>
 </head>
-<body class="bg-white text-gray-800 flex flex-col items-center justify-center min-h-screen p-6">
-    <div class="max-w-md w-full">
-        <h1 class="text-2xl font-bold mb-4 text-center">Select or Add a Present</h1>
-        <form method="post" action="/select_present" class="space-y-4">
-            <label for="present" class="block text-sm font-medium">Select a present:</label>
-            <select name="present_id" id="present" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                {% for present in presents %}
-                    {% if present.status == 'taken' %}
-                        <option value="{{ present.id }}" disabled class="line-through text-gray-400">{{ present.name }} (taken)</option>
-                    {% elif present.status == 'secret' %}
-                        {% if present.taken_by %}
-                            <option value="{{ present.id }}" disabled class="text-gray-400">Secret present (taken)</option>
-                        {% else %}
-                            <option value="{{ present.id }}">Secret present (available)</option>
-                        {% endif %}
-                    {% else %}
-                        <option value="{{ present.id }}">{{ present.name }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-            <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-                Take Present
-            </button>
-        </form>
-        {% include "present_list.html" %}
-        <div class="mt-8">
-            <h2 class="text-lg font-semibold mb-2">Add a Present</h2>
-            <form method="post" action="/add_present" class="space-y-2">
-                <input
-                    type="text"
-                    name="present_name"
-                    required
-                    placeholder="Present name"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-                <label class="inline-flex items-center">
-                    <input type="checkbox" name="secret" class="form-checkbox" />
-                    <span class="ml-2">Secret present</span>
-                </label>
-                <button
-                    type="submit"
-                    class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-                >
-                    Add Present
-                </button>
-            </form>
+
+<body class="text-gray-800 min-h-screen bg-fixed">
+    <!-- Back to invitation link -->
+    <div class="fixed top-0 left-0 z-50 p-4">
+        <a href="/invitation" class="flex items-center bg-white bg-opacity-90 rounded-full shadow-md px-4 py-2 text-sage hover:text-gold transition">
+            <i data-feather="arrow-left" class="w-4 h-4 mr-1"></i>
+            Back to Invitation
+        </a>
+    </div>
+
+    <div class="flex flex-col items-center justify-center min-h-screen p-6">
+        <div class="max-w-lg w-full relative">
+            <!-- Gift icon -->
+            <div class="absolute -top-12 left-1/2 transform -translate-x-1/2" data-aos="fade-down" data-aos-delay="100">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg">
+                    <i data-feather="gift" class="w-12 h-12 text-gold"></i>
+                </div>
+            </div>
+            
+            <!-- Main content -->
+            <div class="bg-white bg-opacity-95 shadow-xl rounded-lg p-8 border border-gold" data-aos="fade-up" data-aos-delay="200">
+                <h1 class="font-script text-4xl text-gold mb-2 text-center gold-text-shadow">Wedding Gifts</h1>
+                <p class="text-center font-serif text-sage mb-8">Select a gift or suggest one for the couple</p>
+                
+                <!-- Select present form -->
+                <form method="post" action="/select_present" class="space-y-4 mb-8">
+                    <label for="present" class="block text-sm font-serif text-gray-700">Choose a gift from the registry:</label>
+                    <select 
+                        name="present_id" 
+                        id="present" 
+                        class="w-full px-4 py-3 border-2 rounded-lg font-sans focus:ring-2 focus:ring-gold focus:outline-none"
+                    >
+                        {% for present in presents %}
+                            {% if present.status == 'taken' %}
+                                <option value="{{ present.id }}" disabled class="line-through text-gray-400">{{ present.name }} (taken)</option>
+                            {% elif present.status == 'secret' %}
+                                {% if present.taken_by %}
+                                    <option value="{{ present.id }}" disabled class="text-gray-400">Secret present (taken)</option>
+                                {% else %}
+                                    <option value="{{ present.id }}">Secret present (available)</option>
+                                {% endif %}
+                            {% else %}
+                                <option value="{{ present.id }}">{{ present.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button
+                        type="submit"
+                        class="w-full bg-gold text-white py-3 px-6 rounded-lg hover:bg-opacity-80 transition font-semibold shadow-md transform hover:-translate-y-1 duration-300 flex items-center justify-center gift-shine"
+                    >
+                        <i data-feather="check-circle" class="w-5 h-5 mr-2"></i>
+                        Reserve This Gift
+                    </button>
+                </form>
+                
+                <!-- Present list -->
+                <div class="border-t border-champagne pt-6 mb-8" data-aos="fade-up" data-aos-delay="400">
+                    {% include "present_list.html" %}
+                </div>
+                
+                <!-- Add present form -->
+                <div class="border-t border-champagne pt-6" data-aos="fade-up" data-aos-delay="600">
+                    <h2 class="text-xl font-serif text-gold mb-4">Suggest a Gift</h2>
+                    <form method="post" action="/add_present" class="space-y-4">
+                        <input
+                            type="text"
+                            name="present_name"
+                            required
+                            placeholder="Gift suggestion"
+                            class="w-full px-4 py-3 border-2 rounded-lg font-sans focus:ring-2 focus:ring-gold focus:outline-none"
+                        />
+                        <div class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                name="secret" 
+                                id="secret" 
+                                class="w-5 h-5 text-gold focus:ring-gold"
+                            />
+                            <label for="secret" class="ml-2 text-gray-700 font-serif">Make this a surprise gift</label>
+                        </div>
+                        <button
+                            type="submit"
+                            class="w-full bg-blush text-white py-3 px-6 rounded-lg hover:bg-opacity-80 transition font-semibold shadow-md transform hover:-translate-y-1 duration-300 flex items-center justify-center gift-shine"
+                        >
+                            <i data-feather="plus-circle" class="w-5 h-5 mr-2"></i>
+                            Add Gift Suggestion
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bottom decorative element -->
+            <div class="mt-6 text-center" data-aos="fade-up" data-aos-delay="800">
+                <svg xmlns="http://www.w3.org/2000/svg" width="120" height="20" viewBox="0 0 120 20" class="inline-block">
+                    <line x1="0" y1="10" x2="120" y2="10" stroke="#d4af37" stroke-width="1" stroke-dasharray="1, 3" />
+                    <circle cx="60" cy="10" r="5" fill="#d4af37" fill-opacity="0.2" stroke="#d4af37" stroke-width="1" />
+                </svg>
+            </div>
         </div>
     </div>
+
+    <!-- Initialize scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize AOS animations
+            AOS.init({
+                duration: 800,
+                once: true
+            });
+            
+            // Initialize Feather Icons
+            feather.replace();
+        });
+    </script>
 </body>
 </html>
