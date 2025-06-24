@@ -5,26 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wedding Invitation</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        script: ['Great Vibes', 'cursive'],
+                    },
+                    colors: {
+                        'gold': '#d4af37',
+                        'blush': '#ffb6c1',
+                        'sage': '#7a918d',
+                        'champagne': '#f7e7ce',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        body {
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f7e7ce' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .gold-text-shadow {
+            text-shadow: 1px 1px 2px rgba(212, 175, 55, 0.3);
+        }
+        .envelope {
+            position: relative;
+            overflow: hidden;
+        }
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0) 50%);
+            z-index: 0;
+        }
+        input[type="text"] {
+            background-color: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+    </style>
 </head>
-<body class="bg-white text-gray-800 flex flex-col items-center justify-center min-h-screen p-6">
-    <div class="max-w-md w-full">
-        <h1 class="text-2xl font-bold mb-4 text-center">You're Invited!</h1>
-        <p class="mb-6 text-center">Please enter your name to RSVP for the wedding.</p>
-        <form method="post" action="/register" class="space-y-4">
-            <input
-                type="text"
-                name="name"
-                required
-                placeholder="Your name"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
-            <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-                RSVP
-            </button>
-        </form>
+
+<body class="text-gray-800 min-h-screen bg-fixed flex flex-col items-center justify-center">
+    <!-- Background decorative element -->
+    <div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none">
+        <div class="absolute top-10 left-10 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="#d4af37">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        </div>
+        <div class="absolute bottom-10 right-10 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="#d4af37">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        </div>
     </div>
+
+    <div class="max-w-md w-full px-6 z-10">
+        <!-- Wedding rings illustration -->
+        <div class="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="100">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="60" viewBox="0 0 80 60" fill="none">
+                <circle cx="30" cy="30" r="15" stroke="#d4af37" stroke-width="2" fill="none" />
+                <circle cx="50" cy="30" r="15" stroke="#d4af37" stroke-width="2" fill="none" />
+            </svg>
+        </div>
+
+        <div class="bg-white bg-opacity-95 shadow-xl rounded-lg p-8 border border-gold relative envelope mb-8" data-aos="fade-up" data-aos-delay="200">
+            <h1 class="font-script text-4xl md:text-5xl text-gold mb-2 text-center gold-text-shadow">You're Invited!</h1>
+            <h2 class="font-serif text-xl text-sage mb-6 text-center">To Our Wedding Celebration</h2>
+            
+            <p class="mb-8 text-center font-sans">Please enter your name to RSVP for the wedding.</p>
+            
+            <form method="post" action="/register" class="space-y-6">
+                <div class="relative">
+                    <i data-feather="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input
+                        type="text"
+                        name="name"
+                        required
+                        placeholder="Your full name"
+                        class="w-full px-10 py-3 border-2 border-champagne rounded-lg focus:outline-none focus:border-gold"
+                    />
+                </div>
+                
+                <button
+                    type="submit"
+                    class="w-full bg-gold text-white py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300 font-semibold shadow-md transform hover:-translate-y-1 pulse-btn flex items-center justify-center"
+                >
+                    <i data-feather="send" class="h-5 w-5 mr-2"></i>
+                    RSVP
+                </button>
+            </form>
+        </div>
+        
+        <!-- Bottom decorative element -->
+        <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="150" height="30" viewBox="0 0 150 30" fill="none" class="inline-block">
+                <path d="M0 15h60" stroke="#d4af37" stroke-width="1" stroke-dasharray="1, 2"/>
+                <path d="M90 15h60" stroke="#d4af37" stroke-width="1" stroke-dasharray="1, 2"/>
+                <path d="M75 7.5c-4.142 0-7.5 3.358-7.5 7.5s3.358 7.5 7.5 7.5 7.5-3.358 7.5-7.5-3.358-7.5-7.5-7.5z" stroke="#d4af37" fill="none"/>
+                <path d="M75 10.5c-2.485 0-4.5 2.015-4.5 4.5s2.015 4.5 4.5 4.5 4.5-2.015 4.5-4.5-2.015-4.5-4.5-4.5z" stroke="#d4af37" fill="none"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Initialize scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize AOS animations
+            AOS.init({
+                duration: 1000,
+                once: true
+            });
+            
+            // Initialize Feather Icons
+            feather.replace();
+        });
+    </script>
 </body>
 </html>
