@@ -1,28 +1,138 @@
 <div>
-    <h2 class="text-xl font-serif text-gold mb-4">Gift Registry</h2>
+    <h2 class="text-xl font-serif text-gold mb-4">
+        {% if lang == 'pl' %}Lista prezentów
+        {% elif lang == 'uk' %}Реєстр подарунків
+        {% elif lang == 'by' %}Рэгістр падарункаў
+        {% else %}Gift Registry{% endif %}
+    </h2>
     <div class="bg-champagne bg-opacity-20 rounded-lg p-4">
-        <ul class="divide-y divide-champagne">
-            {% for present in presents %}
-                {% if present.status == 'secret' and present.taken_by %}
-                    <li class="py-3 px-2 flex items-center">
-                        <i data-feather="gift" class="w-4 h-4 mr-3 text-gray-400"></i>
-                        <span class="italic text-gray-400 flex-grow">Secret gift (reserved)</span>
-                        <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full">Reserved</span>
-                    </li>
-                {% elif present.status == 'taken' %}
-                    <li class="py-3 px-2 flex items-center">
-                        <i data-feather="gift" class="w-4 h-4 mr-3 text-gray-400"></i>
-                        <span class="line-through text-gray-400 flex-grow">{{ present.name }}</span>
-                        <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full">Reserved</span>
-                    </li>
-                {% else %}
-                    <li class="py-3 px-2 flex items-center">
-                        <i data-feather="gift" class="w-4 h-4 mr-3 text-gold"></i>
-                        <span class="flex-grow">{{ present.name }}</span>
-                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Available</span>
-                    </li>
-                {% endif %}
-            {% endfor %}
+        <ul class="divide-y divide-champagne" id="present-list">
+            <!-- This will be populated by JavaScript -->
+            <li class="py-3 px-2 text-center">
+                <span class="italic text-gray-500">
+                    {% if lang == 'pl' %}Ładowanie prezentów...
+                    {% elif lang == 'uk' %}Завантаження подарунків...
+                    {% elif lang == 'by' %}Загрузка падарункаў...
+                    {% else %}Loading gifts...{% endif %}
+                </span>
+            </li>
         </ul>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(populatePresentList, 300); // Give time for presentsData to load
+    });
+    
+    function populatePresentList() {
+        const presentList = document.getElementById('present-list');
+        if (!presentList) return;
+        
+        // Check if we have presents data from the global variable
+        if (typeof presentsData === 'undefined' || !Array.isArray(presentsData)) {
+            console.error('Presents data not available');
+            
+            // Show error message
+            presentList.innerHTML = `<li class="py-3 px-2 text-center italic text-red-500">
+                {% if lang == 'pl' %}Błąd podczas ładowania prezentów
+                {% elif lang == 'uk' %}Помилка під час завантаження подарунків
+                {% elif lang == 'by' %}Памылка пры загрузцы падарункаў
+                {% else %}Error loading gifts{% endif %}
+            </li>`;
+            return;
+        }
+        
+        presentList.innerHTML = '';
+        
+        if (presentsData.length === 0) {
+            const emptyMsg = document.createElement('li');
+            emptyMsg.className = 'py-3 px-2 text-center italic text-gray-500';
+            
+            if ('{{ lang }}' === 'pl') {
+                emptyMsg.textContent = 'Brak prezentów na liście';
+            } else if ('{{ lang }}' === 'uk') {
+                emptyMsg.textContent = 'Немає подарунків у списку';
+            } else if ('{{ lang }}' === 'by') {
+                emptyMsg.textContent = 'Няма падарункаў у спісе';
+            } else {
+                emptyMsg.textContent = 'No gifts in the registry yet';
+            }
+            presentList.appendChild(emptyMsg);
+            return;
+        }
+        
+        presentsData.forEach(present => {
+            const listItem = document.createElement('li');
+            listItem.className = 'py-3 px-2 flex items-center';
+            
+            const icon = document.createElement('i');
+            icon.setAttribute('data-feather', 'gift');
+            
+            const textSpan = document.createElement('span');
+            const statusBadge = document.createElement('span');
+            statusBadge.className = 'text-xs px-2 py-1 rounded-full';
+            
+            if (present.status === 'secret' && present.taken_by) {
+                icon.className = 'w-4 h-4 mr-3 text-gray-400';
+                textSpan.className = 'italic text-gray-400 flex-grow';
+                
+                if ('{{ lang }}' === 'pl') {
+                    textSpan.textContent = 'Tajny prezent (zarezerwowany)';
+                    statusBadge.textContent = 'Zarezerwowany';
+                } else if ('{{ lang }}' === 'uk') {
+                    textSpan.textContent = 'Секретний подарунок (зарезервований)';
+                    statusBadge.textContent = 'Зарезервований';
+                } else if ('{{ lang }}' === 'by') {
+                    textSpan.textContent = 'Сакрэтны падарунак (зарэзерваваны)';
+                    statusBadge.textContent = 'Зарэзерваўны';
+                } else {
+                    textSpan.textContent = 'Secret gift (reserved)';
+                    statusBadge.textContent = 'Reserved';
+                }
+                
+                statusBadge.className += ' bg-gray-200 text-gray-500';
+            } else if (present.status === 'taken') {
+                icon.className = 'w-4 h-4 mr-3 text-gray-400';
+                textSpan.className = 'line-through text-gray-400 flex-grow';
+                textSpan.textContent = present.name;
+                
+                if ('{{ lang }}' === 'pl') {
+                    statusBadge.textContent = 'Zarezerwowany';
+                } else if ('{{ lang }}' === 'uk') {
+                    statusBadge.textContent = 'Зарезервований';
+                } else if ('{{ lang }}' === 'by') {
+                    statusBadge.textContent = 'Зарэзерваўны';
+                } else {
+                    statusBadge.textContent = 'Reserved';
+                }
+                
+                statusBadge.className += ' bg-gray-200 text-gray-500';
+            } else {
+                icon.className = 'w-4 h-4 mr-3 text-gold';
+                textSpan.className = 'flex-grow';
+                textSpan.textContent = present.name;
+                
+                if ('{{ lang }}' === 'pl') {
+                    statusBadge.textContent = 'Dostępny';
+                } else if ('{{ lang }}' === 'uk') {
+                    statusBadge.textContent = 'Доступний';
+                } else if ('{{ lang }}' === 'by') {
+                    statusBadge.textContent = 'Даступны';
+                } else {
+                    statusBadge.textContent = 'Available';
+                }
+                
+                statusBadge.className += ' bg-green-100 text-green-700';
+            }
+            
+            listItem.appendChild(icon);
+            listItem.appendChild(textSpan);
+            listItem.appendChild(statusBadge);
+            presentList.appendChild(listItem);
+        });
+        
+        // Re-initialize Feather icons since we added new ones
+        feather.replace();
+    }
+</script>

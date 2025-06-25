@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -70,17 +70,8 @@
     <!-- Falling hearts animation container -->
     <div class="hearts" id="hearts"></div>
 
-    <!-- Language selector -->
-    <div class="fixed top-0 right-0 z-50 p-4">
-        <div class="bg-white bg-opacity-90 rounded-full shadow-md p-2">
-            <form method="get" action="/invitation" class="flex space-x-1">
-                <button name="lang" value="en" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang != 'pl' and lang != 'uk' and lang != 'by' %}bg-gold text-white{% endif %}">EN</button>
-                <button name="lang" value="pl" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang == 'pl' %}bg-gold text-white{% endif %}">PL</button>
-                <button name="lang" value="uk" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang == 'uk' %}bg-gold text-white{% endif %}">UA</button>
-                <button name="lang" value="by" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang == 'by' %}bg-gold text-white{% endif %}">BY</button>
-            </form>
-        </div>
-    </div>
+    <!-- Include language selector -->
+    {% include "language_selector.html" %}
 
     <div class="flex flex-col items-center justify-center min-h-screen p-6 relative">
         <!-- Top decorative element -->
@@ -124,7 +115,7 @@
                     <div class="flex flex-col space-y-4 my-8">
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="calendar" class="text-gold"></i>
-                            <span class="font-serif">Data: <span class="font-semibold">20 września 2025</span></span>
+                            <span class="font-serif">Data: <span class="font-semibold">18września 2025</span></span>
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="clock" class="text-gold"></i>
@@ -132,7 +123,7 @@
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="map-pin" class="text-gold"></i>
-                            <span class="font-serif">Miejsce: <span class="font-semibold">Sunset Gardens, Main Hall</span></span>
+                            <span class="font-serif">Miejsce: <span class="font-semibold">Hotel Pałacyk Zawady</span></span>
                         </div>
                     </div>
                     
@@ -148,7 +139,7 @@
                     <div class="flex flex-col space-y-4 my-8">
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="calendar" class="text-gold"></i>
-                            <span class="font-serif">Дата: <span class="font-semibold">20 вересня 2025</span></span>
+                            <span class="font-serif">Дата: <span class="font-semibold">18вересня 2025</span></span>
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="clock" class="text-gold"></i>
@@ -156,7 +147,7 @@
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="map-pin" class="text-gold"></i>
-                            <span class="font-serif">Місце: <span class="font-semibold">Sunset Gardens, Main Hall</span></span>
+                            <span class="font-serif">Місце: <span class="font-semibold">Hotel Pałacyk Zawady</span></span>
                         </div>
                     </div>
                     
@@ -172,7 +163,7 @@
                     <div class="flex flex-col space-y-4 my-8">
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="calendar" class="text-gold"></i>
-                            <span class="font-serif">Дата: <span class="font-semibold">20 верасня 2025</span></span>
+                            <span class="font-serif">Дата: <span class="font-semibold">18верасня 2025</span></span>
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="clock" class="text-gold"></i>
@@ -180,7 +171,7 @@
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="map-pin" class="text-gold"></i>
-                            <span class="font-serif">Месца: <span class="font-semibold">Sunset Gardens, Main Hall</span></span>
+                            <span class="font-serif">Месца: <span class="font-semibold">Hotel Pałacyk Zawady</span></span>
                         </div>
                     </div>
                     
@@ -204,7 +195,7 @@
                         </div>
                         <div class="flex items-center justify-center space-x-3">
                             <i data-feather="map-pin" class="text-gold"></i>
-                            <span class="font-serif">Venue: <span class="font-semibold">Sunset Gardens, Main Hall</span></span>
+                            <span class="font-serif">Venue: <span class="font-semibold">Hotel Pałacyk Zawady</span></span>
                         </div>
                     </div>
                     
@@ -226,7 +217,7 @@
                         Add to Calendar
                         {% endif %}
                     </a>
-                    <a href="/presents" class="inline-flex items-center px-6 py-3 bg-blush text-white rounded-full font-semibold hover:bg-opacity-80 transition shadow-md transform hover:-translate-y-1 duration-300">
+                    <a href="/presents?lang={{ lang }}" class="inline-flex items-center px-6 py-3 bg-blush text-white rounded-full font-semibold hover:bg-opacity-80 transition shadow-md transform hover:-translate-y-1 duration-300">
                         <i data-feather="gift" class="mr-2 h-5 w-5"></i>
                         {% if lang == 'pl' %}
                         Zobacz prezenty

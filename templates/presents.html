@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wedding Gifts</title>
+    <title>{% if lang == 'pl' %}Prezenty Ślubne{% elif lang == 'uk' %}Весільні подарунки{% elif lang == 'by' %}Вясельныя падарункі{% else %}Wedding Gifts{% endif %}</title>
+    <!-- Hidden element containing JSON data for any future client-side use -->
+    <script id="presents-json-data" type="application/json">{{ presents_json }}</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -73,14 +75,97 @@
             box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
         }
     </style>
+    <script>
+        // This will hold the parsed presents data
+        let presentsData = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Parse the JSON string from the server
+            try {
+                presentsData = JSON.parse('{{ presents_json | safe }}');
+                populatePresents();
+            } catch (error) {
+                console.error('Error parsing presents data:', error);
+            }
+        });
+        
+        function populatePresents() {
+            const presentSelect = document.getElementById('present');
+            if (!presentSelect || !presentsData || !presentsData.length) return;
+            
+            // Clear any existing options
+            presentSelect.innerHTML = '';
+            
+            // Add options based on the presents data
+            presentsData.forEach(present => {
+                const option = document.createElement('option');
+                option.value = present.id;
+                
+                if (present.status === 'taken') {
+                    option.disabled = true;
+                    option.className = 'line-through text-gray-400';
+                    
+                    let takenText;
+                    if ('{{ lang }}' === 'pl') takenText = '(zajęty)';
+                    else if ('{{ lang }}' === 'uk') takenText = '(зайнятий)';
+                    else if ('{{ lang }}' === 'by') takenText = '(заняты)';
+                    else takenText = '(taken)';
+                    
+                    option.textContent = `${present.name} ${takenText}`;
+                } 
+                else if (present.status === 'secret') {
+                    let secretText;
+                    
+                    if (present.taken_by) {
+                        option.disabled = true;
+                        option.className = 'text-gray-400';
+                        
+                        if ('{{ lang }}' === 'pl') secretText = 'Tajny prezent (zajęty)';
+                        else if ('{{ lang }}' === 'uk') secretText = 'Секретний подарунок (зайнятий)';
+                        else if ('{{ lang }}' === 'by') secretText = 'Сакрэтны падарунак (заняты)';
+                        else secretText = 'Secret present (taken)';
+                    } else {
+                        if ('{{ lang }}' === 'pl') secretText = 'Tajny prezent (dostępny)';
+                        else if ('{{ lang }}' === 'uk') secretText = 'Секретний подарунок (доступний)';
+                        else if ('{{ lang }}' === 'by') secretText = 'Сакрэтны падарунак (даступны)';
+                        else secretText = 'Secret present (available)';
+                    }
+                    
+                    option.textContent = secretText;
+                } 
+                else {
+                    option.textContent = present.name;
+                }
+                
+                presentSelect.appendChild(option);
+            });
+            
+            // Also update the present list
+            updatePresentList();
+        }
+        
+        function updatePresentList() {
+            const presentList = document.getElementById('present-list-container');
+            if (!presentList || !presentsData) return;
+            
+            // We'll let the server-side template handle this part
+            // The present_list.html will use the same presents_json data
+        }
+    </script>
 </head>
 
 <body class="text-gray-800 min-h-screen bg-fixed">
+    <!-- Include language selector -->
+    {% include "language_selector.html" %}
+    
     <!-- Back to invitation link -->
     <div class="fixed top-0 left-0 z-50 p-4">
-        <a href="/invitation" class="flex items-center bg-white bg-opacity-90 rounded-full shadow-md px-4 py-2 text-sage hover:text-gold transition">
+        <a href="/invitation?lang={{ lang }}" class="flex items-center bg-white bg-opacity-90 rounded-full shadow-md px-4 py-2 text-sage hover:text-gold transition">
             <i data-feather="arrow-left" class="w-4 h-4 mr-1"></i>
-            Back to Invitation
+            {% if lang == 'pl' %}Wróć do zaproszenia
+            {% elif lang == 'uk' %}Повернутися до запрошення
+            {% elif lang == 'by' %}Вярнуцца да запрашэння
+            {% else %}Back to Invitation{% endif %}
         </a>
     </div>
 
@@ -95,12 +180,28 @@
             
             <!-- Main content -->
             <div class="bg-white bg-opacity-95 shadow-xl rounded-lg p-8 border border-gold" data-aos="fade-up" data-aos-delay="200">
-                <h1 class="font-script text-4xl text-gold mb-2 text-center gold-text-shadow">Wedding Gifts</h1>
-                <p class="text-center font-serif text-sage mb-8">Select a gift or suggest one for the couple</p>
+                <h1 class="font-script text-4xl text-gold mb-2 text-center gold-text-shadow">
+                    {% if lang == 'pl' %}Prezenty Ślubne
+                    {% elif lang == 'uk' %}Весільні подарунки
+                    {% elif lang == 'by' %}Вясельныя падарункі
+                    {% else %}Wedding Gifts{% endif %}
+                </h1>
+                <p class="text-center font-serif text-sage mb-8">
+                    {% if lang == 'pl' %}Wybierz prezent lub zaproponuj własny dla pary młodej
+                    {% elif lang == 'uk' %}Виберіть подарунок або запропонуйте свій для пари
+                    {% elif lang == 'by' %}Выберыце падарунак або прапануйце свой для пары
+                    {% else %}Select a gift or suggest one for the couple{% endif %}
+                </p>
                 
                 <!-- Select present form -->
                 <form method="post" action="/select_present" class="space-y-4 mb-8">
-                    <label for="present" class="block text-sm font-serif text-gray-700">Choose a gift from the registry:</label>
+                    <input type="hidden" name="lang" value="{{ lang }}">
+                    <label for="present" class="block text-sm font-serif text-gray-700">
+                        {% if lang == 'pl' %}Wybierz prezent z rejestru:
+                        {% elif lang == 'uk' %}Виберіть подарунок з реєстру:
+                        {% elif lang == 'by' %}Выберыце падарунак з рэгістру:
+                        {% else %}Choose a gift from the registry:{% endif %}
+                    </label>
                     <select 
                         name="present_id" 
                         id="present" 
@@ -108,12 +209,28 @@
                     >
                         {% for present in presents %}
                             {% if present.status == 'taken' %}
-                                <option value="{{ present.id }}" disabled class="line-through text-gray-400">{{ present.name }} (taken)</option>
+                                <option value="{{ present.id }}" disabled class="line-through text-gray-400">
+                                    {{ present.name }} 
+                                    {% if lang == 'pl' %}(zajęty)
+                                    {% elif lang == 'uk' %}(зайнятий)
+                                    {% elif lang == 'by' %}(заняты)
+                                    {% else %}(taken){% endif %}
+                                </option>
                             {% elif present.status == 'secret' %}
                                 {% if present.taken_by %}
-                                    <option value="{{ present.id }}" disabled class="text-gray-400">Secret present (taken)</option>
+                                    <option value="{{ present.id }}" disabled class="text-gray-400">
+                                        {% if lang == 'pl' %}Tajny prezent (zajęty)
+                                        {% elif lang == 'uk' %}Секретний подарунок (зайнятий)
+                                        {% elif lang == 'by' %}Сакрэтны падарунак (заняты)
+                                        {% else %}Secret present (taken){% endif %}
+                                    </option>
                                 {% else %}
-                                    <option value="{{ present.id }}">Secret present (available)</option>
+                                    <option value="{{ present.id }}">
+                                        {% if lang == 'pl' %}Tajny prezent (dostępny)
+                                        {% elif lang == 'uk' %}Секретний подарунок (доступний)
+                                        {% elif lang == 'by' %}Сакрэтны падарунак (даступны)
+                                        {% else %}Secret present (available){% endif %}
+                                    </option>
                                 {% endif %}
                             {% else %}
                                 <option value="{{ present.id }}">{{ present.name }}</option>
@@ -125,24 +242,33 @@
                         class="w-full bg-gold text-white py-3 px-6 rounded-lg hover:bg-opacity-80 transition font-semibold shadow-md transform hover:-translate-y-1 duration-300 flex items-center justify-center gift-shine"
                     >
                         <i data-feather="check-circle" class="w-5 h-5 mr-2"></i>
-                        Reserve This Gift
+                        {% if lang == 'pl' %}Zarezerwuj ten prezent
+                        {% elif lang == 'uk' %}Зарезервувати цей подарунок
+                        {% elif lang == 'by' %}Забраніраваць гэты падарунак
+                        {% else %}Reserve This Gift{% endif %}
                     </button>
                 </form>
                 
                 <!-- Present list -->
-                <div class="border-t border-champagne pt-6 mb-8" data-aos="fade-up" data-aos-delay="400">
+                <div class="border-t border-champagne pt-6 mb-8" data-aos="fade-up" data-aos-delay="400" id="present-list-container">
                     {% include "present_list.html" %}
                 </div>
                 
                 <!-- Add present form -->
                 <div class="border-t border-champagne pt-6" data-aos="fade-up" data-aos-delay="600">
-                    <h2 class="text-xl font-serif text-gold mb-4">Suggest a Gift</h2>
+                    <h2 class="text-xl font-serif text-gold mb-4">
+                        {% if lang == 'pl' %}Zaproponuj prezent
+                        {% elif lang == 'uk' %}Запропонувати подарунок
+                        {% elif lang == 'by' %}Прапанаваць падарунак
+                        {% else %}Suggest a Gift{% endif %}
+                    </h2>
                     <form method="post" action="/add_present" class="space-y-4">
+                        <input type="hidden" name="lang" value="{{ lang }}">
                         <input
                             type="text"
                             name="present_name"
                             required
-                            placeholder="Gift suggestion"
+                            placeholder="{% if lang == 'pl' %}Propozycja prezentu{% elif lang == 'uk' %}Пропозиція подарунка{% elif lang == 'by' %}Прапанова падарунка{% else %}Gift suggestion{% endif %}"
                             class="w-full px-4 py-3 border-2 rounded-lg font-sans focus:ring-2 focus:ring-gold focus:outline-none"
                         />
                         <div class="flex items-center">
@@ -152,14 +278,22 @@
                                 id="secret" 
                                 class="w-5 h-5 text-gold focus:ring-gold"
                             />
-                            <label for="secret" class="ml-2 text-gray-700 font-serif">Make this a surprise gift</label>
+                            <label for="secret" class="ml-2 text-gray-700 font-serif">
+                                {% if lang == 'pl' %}Niech to będzie niespodzianka
+                                {% elif lang == 'uk' %}Зробити це сюрпризом
+                                {% elif lang == 'by' %}Зрабіць гэта сюрпрызам
+                                {% else %}Make this a surprise gift{% endif %}
+                            </label>
                         </div>
                         <button
                             type="submit"
                             class="w-full bg-blush text-white py-3 px-6 rounded-lg hover:bg-opacity-80 transition font-semibold shadow-md transform hover:-translate-y-1 duration-300 flex items-center justify-center gift-shine"
                         >
                             <i data-feather="plus-circle" class="w-5 h-5 mr-2"></i>
-                            Add Gift Suggestion
+                            {% if lang == 'pl' %}Dodaj propozycję prezentu
+                            {% elif lang == 'uk' %}Додати пропозицію подарунка
+                            {% elif lang == 'by' %}Дадаць прапанову падарунка
+                            {% else %}Add Gift Suggestion{% endif %}
                         </button>
                     </form>
                 </div>
