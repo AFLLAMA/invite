@@ -13,6 +13,9 @@ pub struct User {
 #[diesel(table_name = users)]
 pub struct NewUser {
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[diesel(skip_insertion)]
+    pub lang: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Identifiable, Associations)]

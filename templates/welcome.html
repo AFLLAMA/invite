@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wedding Invitation</title>
+    <title>
+        {% if lang == 'pl' %}Zaproszenie ślubne
+        {% elif lang == 'uk' %}Весільне запрошення
+        {% elif lang == 'by' %}Вясельнае запрашэнне
+        {% else %}Wedding Invitation{% endif %}
+    </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -86,6 +91,9 @@
         </div>
     </div>
 
+    <!-- Include language selector -->
+    {% include "language_selector.html" %}
+
     <div class="max-w-md w-full px-6 z-10">
         <!-- Wedding rings illustration -->
         <div class="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="100">
@@ -96,10 +104,25 @@
         </div>
 
         <div class="bg-white bg-opacity-95 shadow-xl rounded-lg p-8 border border-gold relative envelope mb-8" data-aos="fade-up" data-aos-delay="200">
-            <h1 class="font-script text-4xl md:text-5xl text-gold mb-2 text-center gold-text-shadow">You're Invited!</h1>
-            <h2 class="font-serif text-xl text-sage mb-6 text-center">To Our Wedding Celebration</h2>
+            <h1 class="font-script text-4xl md:text-5xl text-gold mb-2 text-center gold-text-shadow">
+                {% if lang == 'pl' %}Jesteś zaproszony!
+                {% elif lang == 'uk' %}Ви запрошені!
+                {% elif lang == 'by' %}Вы запрошаны!
+                {% else %}You're Invited!{% endif %}
+            </h1>
+            <h2 class="font-serif text-xl text-sage mb-6 text-center">
+                {% if lang == 'pl' %}Na nasze wesele
+                {% elif lang == 'uk' %}На наше весілля
+                {% elif lang == 'by' %}На нашу вяселле
+                {% else %}To Our Wedding Celebration{% endif %}
+            </h2>
             
-            <p class="mb-8 text-center font-sans">Please enter your name to RSVP for the wedding.</p>
+            <p class="mb-8 text-center font-sans">
+                {% if lang == 'pl' %}Wpisz swoje imię i nazwisko, aby potwierdzić obecność na weselu.
+                {% elif lang == 'uk' %}Будь ласка, введіть своє ім'я, щоб підтвердити присутність на весіллі.
+                {% elif lang == 'by' %}Калі ласка, увядзіце ваша імя, каб пацвердзіць прысутнасць на вяселлі.
+                {% else %}Please enter your name to RSVP for the wedding.{% endif %}
+            </p>
             
             <form method="post" action="/register" class="space-y-6">
                 <div class="relative">
@@ -108,17 +131,23 @@
                         type="text"
                         name="name"
                         required
-                        placeholder="Your full name"
+                        placeholder="{% if lang == 'pl' %}Twoje imię i nazwisko{% elif lang == 'uk' %}Ваше повне ім'я{% elif lang == 'by' %}Ваша поўнае імя{% else %}Your full name{% endif %}"
                         class="w-full px-10 py-3 border-2 border-champagne rounded-lg focus:outline-none focus:border-gold"
                     />
                 </div>
+                
+                <!-- Add hidden language field -->
+                <input type="hidden" name="lang" value="{{ lang }}">
                 
                 <button
                     type="submit"
                     class="w-full bg-gold text-white py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300 font-semibold shadow-md transform hover:-translate-y-1 pulse-btn flex items-center justify-center"
                 >
                     <i data-feather="send" class="h-5 w-5 mr-2"></i>
-                    RSVP
+                    {% if lang == 'pl' %}POTWIERDŹ
+                    {% elif lang == 'uk' %}ПІДТВЕРДИТИ
+                    {% elif lang == 'by' %}ПАЦВЕРДЗІЦЬ
+                    {% else %}RSVP{% endif %}
                 </button>
             </form>
         </div>

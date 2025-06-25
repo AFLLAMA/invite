@@ -1,0 +1,15 @@
+<div class="fixed top-0 right-0 z-50 p-4">
+    <div class="bg-white bg-opacity-90 rounded-full shadow-md p-2">
+        <form method="get" action="{{ current_path }}" class="flex space-x-1">
+            {% if hidden_fields is mapping %}
+                {% for hidden_field, value in hidden_fields %}
+                    <input type="hidden" name="{{ hidden_field }}" value="{{ value }}">
+                {% endfor %}
+            {% endif %}
+            <button name="lang" value="en" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang != 'pl' and lang != 'uk' and lang != 'by' %}bg-gold text-white{% endif %}">EN</button>
+            <button name="lang" value="pl" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang == 'pl' %}bg-gold text-white{% endif %}">PL</button>
+            <button name="lang" value="uk" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang == 'uk' %}bg-gold text-white{% endif %}">UA</button>
+            <button name="lang" value="by" type="submit" class="px-3 py-1 rounded-full hover:bg-blush hover:text-white transition {% if lang == 'by' %}bg-gold text-white{% endif %}">BY</button>
+        </form>
+    </div>
+</div>
